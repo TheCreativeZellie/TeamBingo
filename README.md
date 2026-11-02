@@ -16,7 +16,7 @@ Edit only `config.js`.
 - `gridSize` — squares across and down. A card needs at least `gridSize × gridSize` topics (36 at the default of 6).
 - `topics` — the icebreaker pool. Keep each line short enough to fit in a phone square.
 
-Each card is a shuffle of that pool, seeded by the event name and the player's name. The same person sees the same squares if they close the page and open it again. Push to `main` and GitHub Actions republishes the site.
+Each card is a shuffle of that pool, seeded by the event name and the player's name. The same person sees the same squares if they close the page and open it again. Push to `main` and GitHub Actions republishes the site. Pages has to be set to **GitHub Actions** once, under Settings → Pages → Build and deployment.
 
 ## QR code
 
