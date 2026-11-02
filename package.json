@@ -1,0 +1,11 @@
+{
+  "name": "team-bingo",
+  "private": true,
+  "description": "Phone-only team mixer bingo",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.0"
+  }
+}

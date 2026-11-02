@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4c1d95">
+<meta name="description" content="Team mixer bingo. Type your name, meet people, and fill a row or column. Everything stays on your phone.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mixer Bingo">
+<title>Team Mixer Bingo</title>
+<script src="config.js"></script>
+<style>
+  :root {
+    --bg: #f4f0ff;
+    --ink: #1c1433;
+    --muted: #655d80;
+    --brand: #5b2bd6;
+    --brand-dark: #4c1d95;
+    --ok: #128a4e;
+    --ok-bg: #e5f8ee;
+    --card: #fff;
+    --line: #e3daf8;
+    --danger: #b4234a;
+    --gold: #e39b00;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 400px at 50% -80px, #efe7ff 0%, transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    color-scheme: light;
+  }
+  button, input { font: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+  header {
+    background: linear-gradient(160deg, #4c1d95 0%, #6d28d9 48%, #be185d 100%);
+    color: #fff;
+    padding: 16px 16px 18px;
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; line-height: 1.15; }
+  header .sub {
+    font-size: 14px;
+    opacity: 0.95;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  main { padding: 14px 12px 28px; max-width: 560px; margin: 0 auto; }
+  .hidden { display: none !important; }
+  .btn {
+    border: 0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 17px;
+    background: var(--brand);
+    color: #fff;
+    min-height: 52px;
+    width: 100%;
+    touch-action: manipulation;
+  }
+  .btn.ghost { background: transparent; color: var(--brand); border: 2px solid var(--brand); }
+  .btn.danger { background: transparent; color: var(--danger); border: 2px solid #f3b4c4; }
+  .btn.small {
+    width: auto;
+    padding: 10px 14px;
+    min-height: 44px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  .btn.light { background: #fff; color: var(--brand-dark); }
+  label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  input[type="text"] {
+    width: 100%;
+    font-size: 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    background: #fff;
+    min-height: 56px;
+    color: var(--ink);
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--brand); }
+  .error {
+    color: var(--danger);
+    background: #ffe8ef;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 10px 0 0;
+    line-height: 1.35;
+  }
+  .error:empty { display: none; }
+  .hint { color: var(--muted); font-size: 15px; line-height: 1.4; margin: 8px 0; }
+  .hero h2 { margin: 0 0 6px; font-size: 28px; letter-spacing: -0.3px; }
+  .hero p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.4; }
+  .panel {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 16px;
+    margin-top: 14px;
+    box-shadow: 0 8px 24px #4c1d9514;
+  }
+  .steps { margin: 16px 4px 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .steps li {
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px 14px 12px 48px;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.35;
+    box-shadow: 0 1px 4px #1c143312;
+    min-height: 48px;
+  }
+  .steps li span {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #efe7ff;
+    color: var(--brand);
+    font-weight: 800;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+  }
+  .progress { font-size: 14px; color: var(--muted); }
+  .progress b { color: var(--ink); }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .grid { display: grid; gap: 4px; }
+  .sq {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border: 0;
+    border-radius: 10px;
+    background: var(--card);
+    box-shadow: 0 1px 3px #1c143314;
+    padding: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: clamp(9px, 2.35vw, 12px);
+    line-height: 1.15;
+    color: var(--ink);
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    touch-action: manipulation;
+  }
+  .sq .t {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+  .sq.done .t { -webkit-line-clamp: 3; }
+  .sq .tag {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: clamp(8px, 2.1vw, 11px);
+    font-weight: 800;
+    color: #fff;
+    background: var(--ok);
+    border-radius: 6px;
+    padding: 1px 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sq.done { background: var(--ok-bg); box-shadow: inset 0 0 0 2px var(--ok); }
+  .sq.win { background: #fff4cc; box-shadow: inset 0 0 0 3px var(--gold); }
+  .sq.win .tag { background: #c98400; }
+  .legend { font-size: 13px; color: var(--muted); text-align: center; margin: 12px 6px 0; line-height: 1.4; }
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    background: #1c1433aa;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 10;
+  }
+  .sheet {
+    background: var(--bg);
+    width: 100%;
+    max-width: 560px;
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+    padding: 14px 14px calc(16px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+  }
+  .sheet h2 { margin: 0; font-size: 22px; line-height: 1.25; }
+  .sheet-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .win-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: radial-gradient(circle at 50% 12%, #ffe16b, #ff4f8b 46%, #4c1d95);
+    color: #fff;
+    overflow: auto;
+    padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+    text-align: center;
+  }
+  .win-content { position: relative; z-index: 2; }
+  .win-screen h2 {
+    font-size: 64px;
+    margin: 4px 0 0;
+    letter-spacing: 3px;
+    line-height: 1;
+    text-shadow: 0 4px 0 #0003;
+    animation: pop 0.6s cubic-bezier(.2, 1.6, .4, 1);
+  }
+  @keyframes pop { from { transform: scale(.2) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+  .win-screen .who { font-size: 22px; font-weight: 800; margin-top: 6px; }
+  .win-screen .event { opacity: 0.92; font-size: 14px; margin-top: 2px; }
+  .win-card {
+    background: #fff;
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 14px 14px 8px;
+    margin: 14px auto;
+    max-width: 460px;
+    text-align: left;
+    box-shadow: 0 10px 30px #0003;
+  }
+  .win-card h3 { margin: 0 0 8px; font-size: 16px; color: var(--brand-dark); }
+  .win-card ol { margin: 0; padding-left: 22px; }
+  .win-card li { padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 16px; }
+  .win-card li:last-child { border-bottom: 0; }
+  .win-card li b { display: block; }
+  .win-card li span { color: var(--muted); font-size: 13px; }
+  .stamp { font-size: 13px; opacity: 0.95; margin: 4px 0 8px; }
+  .confetti {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 14px;
+    z-index: 1;
+    pointer-events: none;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .win-screen h2 { animation: none; }
+    .confetti { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Team Mixer Bingo</h1>
+  <div class="sub" id="subtitle">Meet someone new for every square</div>
+</header>
+
+<main>
+  <section id="nameScreen" class="hidden">
+    <div class="hero">
+      <h2>What's your name?</h2>
+      <p>It's saved on this phone. Come back with the same name and you'll see the same card.</p>
+    </div>
+    <form id="nameForm" class="panel">
+      <label for="nameInput">Your name</label>
+      <input id="nameInput" type="text" maxlength="40" enterkeyhint="done" autocomplete="name" autocapitalize="words" placeholder="e.g. Sam Rivera" spellcheck="false">
+      <p id="nameError" class="error" role="alert"></p>
+      <div style="height:12px"></div>
+      <button class="btn" id="nameGo" type="submit">Get my card</button>
+    </form>
+    <ol class="steps">
+      <li><span>1</span>Get a card of icebreaker topics.</li>
+      <li><span>2</span>Tap a square and type who you met.</li>
+      <li><span>3</span>Fill a whole row or column to call BINGO.</li>
+    </ol>
+    <div style="height:12px"></div>
+    <button type="button" class="btn ghost hidden" id="nameBack">Back to my card</button>
+  </section>
+
+  <section id="cardView" class="hidden">
+    <div class="statusbar">
+      <div class="progress" id="progress"></div>
+      <div class="row">
+        <button type="button" class="btn small hidden" id="showWin">Bingo</button>
+        <button type="button" class="btn small ghost" id="menuBtn" aria-label="Menu">Menu</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="legend" id="legend"></p>
+  </section>
+</main>
+
+<div class="backdrop hidden" id="picker">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTopic">
+    <div class="sheet-top">
+      <span class="hint" style="margin:0">Who did you meet?</span>
+      <button type="button" class="btn small ghost" id="pickerClose">Close</button>
+    </div>
+    <h2 id="pickerTopic"></h2>
+    <p class="hint" id="pickerHint">Type the name of someone who has also done this. Each person once — not yourself.</p>
+    <form id="tagForm">
+      <label for="tagInput">Their name</label>
+      <input id="tagInput" type="text" maxlength="40" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Name of the person you met" spellcheck="false">
+      <p id="tagError" class="error" role="alert"></p>
+      <div style="height:12px"></div>
+      <button class="btn" id="tagSave" type="submit">Tag them</button>
+    </form>
+    <button type="button" class="btn danger hidden" id="untagBtn">Remove this name</button>
+  </div>
+</div>
+
+<div class="backdrop hidden" id="menu">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+    <div class="sheet-top">
+      <h2 id="menuTitle">Menu</h2>
+      <button type="button" class="btn small ghost" id="menuClose">Close</button>
+    </div>
+    <p class="hint" id="menuWho"></p>
+    <button type="button" class="btn ghost" id="resetCard">Reset my card</button>
+    <button type="button" class="btn ghost" id="changeName">Change my name</button>
+  </div>
+</div>
+
+<div class="win-screen hidden" id="win" role="dialog" aria-modal="true" aria-labelledby="winHeading">
+  <div class="win-content">
+  <div style="font-size:42px" aria-hidden="true">🎉</div>
+  <h2 id="winHeading">BINGO!</h2>
+  <div class="who" id="winWho"></div>
+  <div class="event" id="winEvent"></div>
+  <div id="winLines"></div>
+  <div class="stamp" id="winStamp"></div>
+  <p style="font-size:15px;margin:0 0 14px">Show this screen to the host to verify.</p>
+  <button type="button" class="btn light" id="winClose">Back to my card</button>
+  </div>
+</div>
+
+<noscript>
+  <p class="hint" style="padding:16px">Turn on JavaScript to use your bingo card. It still stays on this phone — nothing is uploaded.</p>
+</noscript>
+
+<script>
+/* ======================= PURE LOGIC (tested headlessly) ======================= */
+const BingoLogic = (() => {
+  function hash(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0;
+  }
+  function rng(seed) {
+    return function () {
+      seed |= 0;
+      seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function normalizeName(s) {
+    return String(s ?? "").trim().replace(/\s+/g, " ").toLowerCase();
+  }
+  function displayName(s) {
+    return String(s ?? "").trim().replace(/\s+/g, " ");
+  }
+  function makeCard(topics, size, playerName, eventName) {
+    const need = size * size;
+    const seen = new Set();
+    const pool = [];
+    for (const topic of topics) {
+      const text = String(topic).trim();
+      if (!text || seen.has(text)) continue;
+      seen.add(text);
+      pool.push(text);
+    }
+    if (pool.length < need) throw new Error(`Need at least ${need} topics, have ${pool.length}`);
+    const random = rng(hash(String(eventName) + "|" + normalizeName(playerName)));
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    return pool.slice(0, need);
+  }
+  // null when the name can be written on square idx. Comparison ignores case and extra whitespace.
+  // The name already on this square is allowed, so a tag can be edited in place.
+  function tagError(playerName, tags, idx, personName) {
+    const name = displayName(personName);
+    const key = normalizeName(name);
+    if (!key) return "empty";
+    if (key === normalizeName(playerName)) return "self";
+    for (const [k, v] of Object.entries(tags || {})) {
+      if (Number(k) !== Number(idx) && normalizeName(v) === key) return "duplicate";
+    }
+    return null;
+  }
+  function canTag(playerName, tags, idx, personName) {
+    return tagError(playerName, tags, idx, personName) === null;
+  }
+  // Full rows (across) and full columns (down) only. Diagonals are ignored on purpose.
+  function lines(tags, size) {
+    const filled = (i) => {
+      const value = tags[i];
+      return value != null && String(value).trim() !== "";
+    };
+    const out = [];
+    for (let r = 0; r < size; r++) {
+      const cells = [...Array(size)].map((_, c) => r * size + c);
+      if (cells.every(filled)) out.push({ type: "row", index: r, cells });
+    }
+    for (let c = 0; c < size; c++) {
+      const cells = [...Array(size)].map((_, r) => r * size + c);
+      if (cells.every(filled)) out.push({ type: "column", index: c, cells });
+    }
+    return out;
+  }
+  return { hash, rng, normalizeName, displayName, makeCard, tagError, canTag, lines };
+})();
+window.BingoLogic = BingoLogic;
+
+/* ============================== APP / UI ============================== */
+const CFG = window.BINGO_CONFIG || {};
+const N = CFG.gridSize || 6;
+const KEY_PLAYER = `bingo:${CFG.eventName || "bingo"}:player`;
+const keyCard = (name) => `bingo:${CFG.eventName || "bingo"}:card:${BingoLogic.normalizeName(name)}`;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[c]));
+
+let state = null;
+let openIdx = null;
+
+function fingerprint() {
+  return String(BingoLogic.hash(N + "\n" + (CFG.topics || []).join("\n")));
+}
+function save() {
+  localStorage.setItem(keyCard(state.player), JSON.stringify({
+    tags: state.tags,
+    winsSeen: state.winsSeen,
+    bingoAt: state.bingoAt,
+    fp: state.fp
+  }));
+  localStorage.setItem(KEY_PLAYER, state.player);
+}
+function sanitizeTags(player, tags) {
+  const out = {};
+  for (const [k, v] of Object.entries(tags || {})) {
+    const idx = Number(k);
+    if (!Number.isInteger(idx) || idx < 0 || idx >= N * N) continue;
+    const name = BingoLogic.displayName(v);
+    if (!BingoLogic.canTag(player, out, idx, name)) continue;
+    out[idx] = name;
+  }
+  return out;
+}
+function showName() {
+  $("nameScreen").classList.remove("hidden");
+  $("cardView").classList.add("hidden");
+  $("subtitle").textContent = "Meet someone new for every square";
+  $("nameError").textContent = "";
+  if (state && state.player) {
+    $("nameBack").classList.remove("hidden");
+    $("nameInput").value = state.player;
+  } else {
+    $("nameBack").classList.add("hidden");
+  }
+}
+function start(rawName) {
+  const player = BingoLogic.displayName(rawName);
+  if (!player) return showName();
+  let topics;
+  try {
+    topics = BingoLogic.makeCard(CFG.topics, N, player, CFG.eventName);
+  } catch (err) {
+    showName();
+    $("nameError").textContent = err.message;
+    return;
+  }
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(keyCard(player)) || "{}"); } catch (e) { saved = {}; }
+  const fp = fingerprint();
+  const sameCard = saved.fp === fp;
+  state = {
+    player,
+    topics,
+    tags: sameCard ? sanitizeTags(player, saved.tags) : {},
+    winsSeen: sameCard && Array.isArray(saved.winsSeen) ? saved.winsSeen : [],
+    bingoAt: sameCard ? (saved.bingoAt || null) : null,
+    fp
+  };
+  if (!BingoLogic.lines(state.tags, N).length) state.bingoAt = null;
+  save();
+  $("nameScreen").classList.add("hidden");
+  $("cardView").classList.remove("hidden");
+  $("subtitle").textContent = state.player;
+  $("title").textContent = CFG.eventName || "Team Mixer Bingo";
+  renderCard();
+}
+function renderCard() {
+  const won = BingoLogic.lines(state.tags, N);
+  const winCells = new Set(won.flatMap((line) => line.cells));
+  $("grid").style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+  $("grid").innerHTML = state.topics.map((topic, i) => {
+    const tag = state.tags[i];
+    const cls = tag ? (winCells.has(i) ? "sq done win" : "sq done") : "sq";
+    const tagAttr = tag ? ` data-tag="${esc(tag)}"` : "";
+    return `<button type="button" class="${cls}" data-i="${i}"${tagAttr} aria-label="${esc(topic)}${tag ? ", tagged " + esc(tag) : ""}"><span class="t">${esc(topic)}</span>${tag ? `<span class="tag">${esc(tag)}</span>` : ""}</button>`;
+  }).join("");
+  const count = Object.keys(state.tags).length;
+  const bingoBit = won.length ? ` · <b>${won.length}</b> bingo${won.length > 1 ? "s" : ""}` : "";
+  $("progress").innerHTML = `<b>${count}</b>/${N * N} people met${bingoBit}`;
+  $("showWin").classList.toggle("hidden", !won.length);
+  $("legend").textContent = "Tap a square and type the name of someone who matches it. Each person can only be used once, and you can't tag yourself. A full row across or column down is BINGO. Diagonals don't count.";
+}
+
+function openPicker(i) {
+  openIdx = i;
+  const current = state.tags[i] || "";
+  $("pickerTopic").textContent = state.topics[i];
+  $("tagInput").value = current;
+  $("tagError").textContent = "";
+  $("tagSave").textContent = current ? "Update name" : "Tag them";
+  $("untagBtn").classList.toggle("hidden", !current);
+  $("picker").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => $("tagInput").focus(), 50);
+}
+function closePicker() {
+  $("picker").classList.add("hidden");
+  openIdx = null;
+  document.body.style.overflow = "";
+}
+function applyTag(raw) {
+  const name = BingoLogic.displayName(raw);
+  const problem = BingoLogic.tagError(state.player, state.tags, openIdx, name);
+  if (problem === "empty") {
+    $("tagError").textContent = "Type the name of the person you met.";
+    return;
+  }
+  if (problem === "self") {
+    $("tagError").textContent = "That's you — tag someone you met.";
+    return;
+  }
+  if (problem === "duplicate") {
+    const key = BingoLogic.normalizeName(name);
+    const existing = Object.entries(state.tags).find(([k, v]) => Number(k) !== openIdx && BingoLogic.normalizeName(v) === key);
+    $("tagError").textContent = `${existing ? existing[1] : name} is already on another square.`;
+    return;
+  }
+  state.tags[openIdx] = name;
+  save();
+  closePicker();
+  renderCard();
+  checkWin();
+}
+
+const lineId = (line) => `${line.type}${line.index}`;
+const lineLabel = (line) => line.type === "row"
+  ? `Row ${line.index + 1} (across)`
+  : `Column ${line.index + 1} (down)`;
+
+function checkWin() {
+  const won = BingoLogic.lines(state.tags, N);
+  const fresh = won.filter((line) => !state.winsSeen.includes(lineId(line)));
+  state.winsSeen = won.map(lineId);
+  if (won.length && !state.bingoAt) state.bingoAt = new Date().toISOString();
+  if (!won.length) state.bingoAt = null;
+  save();
+  if (fresh.length) showWin(fresh);
+}
+function showWin(highlight) {
+  const won = BingoLogic.lines(state.tags, N);
+  if (!won.length) return;
+  const order = highlight
+    ? [...highlight, ...won.filter((line) => !highlight.some((fresh) => lineId(fresh) === lineId(line)))]
+    : won;
+  $("winWho").textContent = state.player;
+  $("winEvent").textContent = CFG.eventName || "";
+  $("winLines").innerHTML = order.map((line) => {
+    const items = line.cells.map((i) => (
+      `<li><b>${esc(state.tags[i])}</b><span>${esc(state.topics[i])}</span></li>`
+    )).join("");
+    return `<div class="win-card"><h3>${esc(lineLabel(line))}</h3><ol>${items}</ol></div>`;
+  }).join("");
+  const when = new Date(state.bingoAt || Date.now());
+  $("winStamp").textContent = `Called at ${when.toLocaleString()}`;
+  $("win").classList.remove("hidden");
+  $("win").scrollTop = 0;
+  confetti();
+}
+function confetti() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#ffe16b", "#5b2bd6", "#18b26b", "#fff", "#ff4f8b", "#7dd3fc"];
+  for (let i = 0; i < 48; i++) {
+    const bit = document.createElement("div");
+    bit.className = "confetti";
+    bit.style.left = Math.random() * 100 + "vw";
+    bit.style.background = colors[i % colors.length];
+    bit.style.animationDuration = (2 + Math.random() * 2.2) + "s";
+    bit.style.animationDelay = Math.random() * 0.5 + "s";
+    bit.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+    $("win").appendChild(bit);
+    setTimeout(() => bit.remove(), 5000);
+  }
+}
+
+$("nameForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = BingoLogic.displayName($("nameInput").value);
+  if (!name) {
+    $("nameError").textContent = "Please type your name.";
+    $("nameInput").focus();
+    return;
+  }
+  $("nameError").textContent = "";
+  start(name);
+});
+$("nameBack").addEventListener("click", () => {
+  if (!state) return;
+  $("nameScreen").classList.add("hidden");
+  $("cardView").classList.remove("hidden");
+  $("subtitle").textContent = state.player;
+});
+$("grid").addEventListener("click", (e) => {
+  const button = e.target.closest(".sq");
+  if (button) openPicker(Number(button.dataset.i));
+});
+$("tagForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (openIdx == null) return;
+  applyTag($("tagInput").value);
+});
+$("tagInput").addEventListener("input", () => { $("tagError").textContent = ""; });
+$("untagBtn").addEventListener("click", () => {
+  delete state.tags[openIdx];
+  save();
+  closePicker();
+  renderCard();
+  checkWin();
+});
+$("pickerClose").addEventListener("click", closePicker);
+$("picker").addEventListener("click", (e) => { if (e.target.id === "picker") closePicker(); });
+
+$("menuBtn").addEventListener("click", () => {
+  $("menuWho").textContent = `Playing as ${state.player}. This card stays on this phone.`;
+  $("menu").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+});
+function closeMenu() {
+  $("menu").classList.add("hidden");
+  document.body.style.overflow = "";
+}
+$("menuClose").addEventListener("click", closeMenu);
+$("menu").addEventListener("click", (e) => { if (e.target.id === "menu") closeMenu(); });
+$("resetCard").addEventListener("click", () => {
+  if (!confirm("Clear every name on your card?")) return;
+  state.tags = {};
+  state.winsSeen = [];
+  state.bingoAt = null;
+  save();
+  closeMenu();
+  $("win").classList.add("hidden");
+  renderCard();
+});
+$("changeName").addEventListener("click", () => {
+  closeMenu();
+  showName();
+  $("nameInput").focus();
+});
+$("showWin").addEventListener("click", () => showWin());
+$("winClose").addEventListener("click", () => $("win").classList.add("hidden"));
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("win").classList.contains("hidden")) { $("win").classList.add("hidden"); return; }
+  if (!$("picker").classList.contains("hidden")) { closePicker(); return; }
+  if (!$("menu").classList.contains("hidden")) closeMenu();
+});
+
+(function boot() {
+  $("title").textContent = CFG.eventName || "Team Mixer Bingo";
+  document.title = CFG.eventName || "Team Mixer Bingo";
+  if (!Array.isArray(CFG.topics) || CFG.topics.length < N * N) {
+    $("nameScreen").classList.remove("hidden");
+    $("nameError").textContent = `config.js needs at least ${N * N} topics.`;
+    $("nameForm").querySelector("button").disabled = true;
+    return;
+  }
+  const saved = localStorage.getItem(KEY_PLAYER);
+  if (saved) start(saved);
+  else showName();
+})();
+</script>
+</body>
+</html>
