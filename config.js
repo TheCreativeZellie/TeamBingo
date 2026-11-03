@@ -58,7 +58,7 @@ window.BINGO_CONFIG = {
     "Has milked a cow or a goat",
     "Has eaten something they foraged",
     "Has cooked or baked for 30+ people",
-    "Has worked a public holiday overnight",
+    "Has been to a music festival abroad",
     "Has volunteered in another country",
     "Has moved to a new country for work",
     "Has lived somewhere with no cinema",
@@ -82,7 +82,7 @@ window.BINGO_CONFIG = {
     "Has built an IKEA PAX wardrobe alone",
     "Can pronounce 8 IKEA product names",
     "Has queued before an IKEA opened",
-    "Holds IKEA Family cards from 2 countries",
+    "Has eaten 20+ IKEA meatballs in one visit",
     "Has driven an IKEA flat-pack 100km+"
   ]
 };
