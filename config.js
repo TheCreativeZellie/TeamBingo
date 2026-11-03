@@ -4,7 +4,7 @@
    eventName  Shown in the header. Changing it gives every phone a
               fresh card and a new save slot.
    gridSize   Cards are gridSize × gridSize. You need at least
-              gridSize × gridSize topics (36 when gridSize is 6).
+              gridSize × gridSize topics (49 when gridSize is 7).
    topics     Short icebreaker prompts. Each card is a shuffle of
               these, seeded by the event name + the player's name,
               so the same person always sees the same card.
@@ -14,7 +14,7 @@
    ===================================================================== */
 window.BINGO_CONFIG = {
   eventName: "Team Mixer Bingo",
-  gridSize: 6,
+  gridSize: 7,
 
   topics: [
     "Has lived abroad",
