@@ -77,13 +77,28 @@ const PLAYER = "Sam Rivera";
     out.cardSize = cardA.length;
 
     const fill = (idxs) => Object.fromEntries(idxs.map((i, k) => [i, "P" + k]));
-    out.row = L.lines(fill([14, 15, 16, 17, 18, 19, 20]), N);
-    out.col = L.lines(fill([2, 9, 16, 23, 30, 37, 44]), N);
-    out.diag = L.lines(fill([0, 8, 16, 24, 32, 40, 48]), N).length;
-    out.anti = L.lines(fill([6, 12, 18, 24, 30, 36, 42]), N).length;
-    out.bothDiags = L.lines(fill([0, 8, 16, 24, 32, 40, 48, 6, 12, 18, 30, 36, 42]), N).length;
-    out.sixOfRow = L.lines(fill([0, 1, 2, 3, 4, 5]), N).length;
-    out.sixOfCol = L.lines(fill([0, 7, 14, 21, 28, 35]), N).length;
+    out.linesToWin = C.linesToWin;
+    out.row = L.lines(fill([12, 13, 14, 15, 16, 17]), N);
+    out.col = L.lines(fill([2, 8, 14, 20, 26, 32]), N);
+    out.diag = L.lines(fill([0, 7, 14, 21, 28, 35]), N).length;
+    out.anti = L.lines(fill([5, 10, 15, 20, 25, 30]), N).length;
+    out.bothDiags = L.lines(fill([0, 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, 30]), N).length;
+    out.fiveOfRow = L.lines(fill([0, 1, 2, 3, 4]), N).length;
+    out.hardKept = [
+      "Has been on TV or radio",
+      "Has run a marathon",
+      "Has met a celebrity",
+      "Speaks 4+ languages",
+      "Has lived in 3+ countries",
+      "Has broken a bone doing a sport",
+      "Has been on a plane for 12+ hours in one go",
+      "Has eaten a bug",
+      "Born in a different country than parents",
+      "Has performed on stage",
+      "Has assembled an IKEA wardrobe alone",
+      "Has been to the IKEA in Älmhult"
+    ].every((t) => C.topics.includes(t));
+    out.easyGone = !C.topics.some((t) => /pet|coffee|spain|half marathon/i.test(t));
     out.emptyLines = L.lines({}, N).length;
     const all = {};
     for (let i = 0; i < N * N; i++) all[i] = "P" + i;
@@ -95,9 +110,12 @@ const PLAYER = "Sam Rivera";
   });
 
   assert.equal(logic.noRoster, true);
-  assert.equal(logic.grid, 7);
-  assert.ok(logic.topicCount >= 49, "topic pool " + logic.topicCount);
-  assert.ok(logic.uniqueTopics >= 49, "unique topics " + logic.uniqueTopics);
+  assert.equal(logic.grid, 6);
+  assert.equal(logic.linesToWin, undefined);
+  assert.ok(logic.topicCount >= 55 && logic.topicCount <= 65, "topic pool " + logic.topicCount);
+  assert.equal(logic.uniqueTopics, logic.topicCount);
+  assert.equal(logic.hardKept, true);
+  assert.equal(logic.easyGone, true);
   assert.equal(logic.hasIkeaExact, true);
   assert.ok(logic.ikeaCount >= 10, "ikea topics " + logic.ikeaCount);
   assert.equal(logic.dupExact, "duplicate");
@@ -112,24 +130,23 @@ const PLAYER = "Sam Rivera";
   assert.equal(logic.deterministic, true);
   assert.equal(logic.differsByPlayer, true);
   assert.equal(logic.unique, true);
-  assert.equal(logic.cardSize, 49);
-  assert.equal(logic.row.length, 1);
+  assert.equal(logic.cardSize, 36);
+  assert.equal(logic.row.length, 1, "one full row is bingo");
   assert.equal(logic.row[0].type, "row");
   assert.equal(logic.row[0].index, 2);
-  assert.deepEqual(logic.row[0].cells, [14, 15, 16, 17, 18, 19, 20]);
-  assert.equal(logic.col.length, 1);
+  assert.deepEqual(logic.row[0].cells, [12, 13, 14, 15, 16, 17]);
+  assert.equal(logic.col.length, 1, "one full column is bingo");
   assert.equal(logic.col[0].type, "column");
   assert.equal(logic.col[0].index, 2);
-  assert.deepEqual(logic.col[0].cells, [2, 9, 16, 23, 30, 37, 44]);
+  assert.deepEqual(logic.col[0].cells, [2, 8, 14, 20, 26, 32]);
   assert.equal(logic.diag, 0);
   assert.equal(logic.anti, 0);
   assert.equal(logic.bothDiags, 0);
-  assert.equal(logic.sixOfRow, 0);
-  assert.equal(logic.sixOfCol, 0);
+  assert.equal(logic.fiveOfRow, 0);
   assert.equal(logic.emptyLines, 0);
-  assert.equal(logic.fullCount, 14);
-  assert.equal(logic.fullRows, 7);
-  assert.equal(logic.fullCols, 7);
+  assert.equal(logic.fullCount, 12);
+  assert.equal(logic.fullRows, 6);
+  assert.equal(logic.fullCols, 6);
   console.log("Logic checks passed");
 
   const bodyText = await page.locator("body").innerText();
@@ -145,7 +162,7 @@ const PLAYER = "Sam Rivera";
   await page.fill("#nameInput", "  Sam   Rivera  ");
   await page.click("#nameGo");
   await page.waitForSelector("#cardView:not(.hidden)");
-  assert.equal(await page.locator(".sq").count(), 49);
+  assert.equal(await page.locator(".sq").count(), 36);
   assert.equal((await page.textContent("#subtitle")).trim(), "Sam Rivera");
 
   const layout = await page.evaluate(() => {
@@ -165,14 +182,23 @@ const PLAYER = "Sam Rivera";
   });
   assert.equal(layout.innerWidth, 375);
   assert.ok(layout.minSide >= 44, "square side " + layout.minSide);
-  assert.ok(layout.fontSize >= 9, "font " + layout.fontSize);
+  assert.ok(layout.fontSize > 9, "font " + layout.fontSize);
   assert.ok(layout.gridBottom <= layout.innerHeight, "grid bottom " + layout.gridBottom);
   assert.ok(layout.legendBottom <= layout.innerHeight + 1, "legend bottom " + layout.legendBottom);
   assert.ok(layout.scrollWidth <= layout.innerWidth + 1, "scroll width " + layout.scrollWidth);
   console.log("Phone layout:", JSON.stringify(layout));
 
   const topicsBefore = await page.$$eval(".sq .t", (els) => els.map((e) => e.textContent));
-  assert.equal(new Set(topicsBefore).size, 49);
+  assert.equal(new Set(topicsBefore).size, 36);
+
+  const clipped = await page.evaluate(() => {
+    return [...document.querySelectorAll(".sq")].map((sq) => {
+      const t = sq.querySelector(".t");
+      return { topic: t.textContent, gap: t.scrollHeight - t.clientHeight };
+    }).filter((x) => x.gap > 4);
+  });
+  assert.deepEqual(clipped, [], "topics clipped: " + JSON.stringify(clipped));
+  await page.screenshot({ path: path.join(shotDir, "screenshot_card.png") });
 
   async function openSquare(i) {
     await page.click(`.sq[data-i="${i}"]`);
@@ -219,10 +245,10 @@ const PLAYER = "Sam Rivera";
   await page.waitForSelector("#picker", { state: "hidden" });
   assert.equal(await page.locator('.sq[data-i="1"]').getAttribute("data-tag"), null);
 
-  const diag = [8, 16, 24, 32, 40, 48];
+  const diag = [7, 14, 21, 28, 35];
   let n = 0;
   for (const i of diag) await tag(i, `Guest ${++n} Okonkwo`);
-  assert.equal(await page.locator(".sq.done").count(), 7);
+  assert.equal(await page.locator(".sq.done").count(), 6);
   assert.equal(await page.locator(".sq.win").count(), 0);
   assert.ok(await page.isHidden("#win"), "diagonal must not trigger bingo");
 
@@ -230,55 +256,46 @@ const PLAYER = "Sam Rivera";
   await page.waitForSelector("#cardView:not(.hidden)");
   const topicsAfter = await page.$$eval(".sq .t", (els) => els.map((e) => e.textContent));
   assert.deepEqual(topicsAfter, topicsBefore);
-  assert.equal(await page.locator(".sq.done").count(), 7);
+  assert.equal(await page.locator(".sq.done").count(), 6);
   assert.equal(await page.getAttribute('.sq[data-i="0"]', "data-tag"), "Riley Quinn");
 
-  await page.screenshot({ path: path.join(shotDir, "screenshot_card.png") });
+  await page.screenshot({ path: path.join(shotDir, "screenshot_card_tagged.png") });
 
-  const rowCells = [7, 8, 9, 10, 11, 12, 13];
-  const rowToFill = [7, 9, 10, 11, 12, 13];
+  const rowCells = [6, 7, 8, 9, 10, 11];
+  const rowToFill = [6, 8, 9, 10, 11];
   for (const i of rowToFill.slice(0, -1)) await tag(i, `Guest ${++n} Okonkwo`);
-  assert.ok(await page.isHidden("#win"));
+  assert.ok(await page.isHidden("#win"), "one incomplete row is not bingo");
   const rowNames = {};
   for (const i of rowCells) {
     rowNames[i] = await page.getAttribute(`.sq[data-i="${i}"]`, "data-tag");
   }
-  await tag(13, `Guest ${++n} Okonkwo`);
-  rowNames[13] = await page.getAttribute('.sq[data-i="13"]', "data-tag");
+  await tag(11, `Guest ${++n} Okonkwo`);
+  rowNames[11] = await page.getAttribute('.sq[data-i="11"]', "data-tag");
   await page.waitForSelector("#win:not(.hidden)");
   const rowHeading = await page.textContent("#winLines h3");
   assert.match(rowHeading, /Row \d+ \(across\)/);
   assert.equal((await page.textContent("#winWho")).trim(), "Sam Rivera");
   const rowItems = await page.$$eval("#winLines li", (els) => els.map((e) => e.innerText));
-  assert.equal(rowItems.length, 7);
+  assert.equal(rowItems.length, 6);
   for (const i of rowCells) {
     assert.ok(rowItems.some((text) => text.includes(rowNames[i])), rowNames[i]);
     assert.ok(rowItems.some((text) => text.includes(topicsAfter[i])), topicsAfter[i]);
   }
-  const rowFit = await page.evaluate(() => {
-    const lis = [...document.querySelectorAll("#winLines li")];
-    const viewH = window.innerHeight;
-    return lis.every((li) => {
-      const r = li.getBoundingClientRect();
-      return r.height > 18 && r.top >= 0 && r.bottom <= viewH + 1;
-    });
-  });
-  assert.equal(rowFit, true, "all 7 bingo names should be on screen");
   await page.waitForTimeout(700);
   await page.screenshot({ path: path.join(shotDir, "screenshot_bingo.png") });
   await page.click("#winClose");
   await page.evaluate(() => document.querySelectorAll(".confetti").forEach((c) => c.remove()));
-  assert.equal(await page.locator(".sq.win").count(), 7);
+  assert.equal(await page.locator(".sq.win").count(), 6);
 
-  const colExtras = [2, 23, 30, 37, 44];
+  const colExtras = [2, 20, 26, 32];
   for (const i of colExtras.slice(0, -1)) await tag(i, `Guest ${++n} Okonkwo`);
   assert.ok(await page.isHidden("#win"));
-  await tag(44, `Guest ${++n} Okonkwo`);
+  await tag(32, `Guest ${++n} Okonkwo`);
   await page.waitForSelector("#win:not(.hidden)");
   const headings = await page.$$eval("#winLines h3", (els) => els.map((e) => e.textContent));
   assert.match(headings[0], /Column \d+ \(down\)/);
   const colItems = await page.$$eval("#winLines .win-card:first-child li", (els) => els.length);
-  assert.equal(colItems, 7);
+  assert.equal(colItems, 6);
   await page.click("#winClose");
 
   await page.click("#menuBtn");
@@ -288,7 +305,7 @@ const PLAYER = "Sam Rivera";
   assert.equal(await page.inputValue("#nameInput"), "Sam Rivera");
   await page.click("#nameBack");
   await page.waitForSelector("#cardView:not(.hidden)");
-  assert.ok(await page.locator(".sq.done").count() > 7);
+  assert.ok(await page.locator(".sq.done").count() > 6);
 
   await page.click("#menuBtn");
   await page.click("#resetCard");

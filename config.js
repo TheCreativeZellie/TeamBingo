@@ -4,90 +4,85 @@
    eventName  Shown in the header. Changing it gives every phone a
               fresh card and a new save slot.
    gridSize   Cards are gridSize × gridSize. You need at least
-              gridSize × gridSize topics (49 when gridSize is 7).
-   topics     Short icebreaker prompts. Each card is a shuffle of
-              these, seeded by the event name + the player's name,
-              so the same person always sees the same card.
-   Keep every prompt short — it has to fit in a small phone square.
+              gridSize × gridSize topics (36 when gridSize is 6).
+   topics     Icebreaker prompts. Aim for things only a few people
+              on a team of about 60 have done (roughly 5–15%). Skip
+              easy ones ("has a pet", "likes coffee", "been to Spain")
+              and skip health, religion, politics, money, and other
+              sensitive personal subjects. Keep each line short enough
+              to fit in a phone square.
+              Each card is a shuffle of the pool, seeded by the event
+              name + the player's name, so the same person always
+              sees the same card.
    There is no roster. Players type their own name, then type the
-   names of people they meet.
+   names of people they meet. One full row or column is BINGO.
    ===================================================================== */
 window.BINGO_CONFIG = {
   eventName: "Team Mixer Bingo",
-  gridSize: 7,
+  gridSize: 6,
 
   topics: [
-    "Has lived abroad",
-    "Speaks 3+ languages",
-    "Has run a half marathon",
-    "Plays an instrument",
     "Has been on TV or radio",
-    "Was born in another country",
-    "Has a pet that isn't a cat or dog",
-    "Has gone skydiving",
-    "Can juggle",
-    "Has visited 20+ countries",
+    "Has run a marathon",
     "Has met a celebrity",
-    "Has been to a music festival",
-    "Has gone camping in winter",
-    "Has broken a bone",
-    "Is a twin or has twins",
-    "Has cooked for 20+ people",
-    "Has done stand-up or improv",
-    "Has climbed a mountain",
-    "Has swum in the Arctic sea",
-    "Has ridden a horse",
-    "Has built a piece of furniture",
-    "Has written a poem or song",
-    "Has worked in a restaurant",
-    "Has had a viral post",
-    "Has been in a band",
-    "Has run their own business",
+    "Speaks 4+ languages",
+    "Has lived in 3+ countries",
+    "Has broken a bone doing a sport",
+    "Has been on a plane for 12+ hours in one go",
+    "Has eaten a bug",
+    "Born in a different country than parents",
+    "Has performed on stage",
+    "Has gone skydiving",
+    "Has bungee jumped",
+    "Has scuba dived below 10m",
     "Has seen the Northern Lights",
-    "Has been to Japan",
-    "Has scuba dived",
-    "Has learned to code as a kid",
-    "Has a hidden talent",
-    "Has done a hackathon",
-    "Has moved city for a job",
-    "Has grown their own vegetables",
-    "Has been on a cruise",
-    "Has slept in an airport",
-    "Has read 20+ books in a year",
+    "Has slept overnight in an airport",
+    "Has finished a triathlon",
+    "Has cycled 100km in one day",
+    "Has been above 3000 meters",
+    "Has swum in two different oceans",
+    "Has set foot on 4 continents",
+    "Has been an extra in a film or TV show",
+    "Has played a gig in a band",
+    "Has done stand-up or improv",
     "Can solve a Rubik's cube",
-    "Has taken a dance class",
-    "Has volunteered abroad",
-    "Has been in a play",
-    "Has made sourdough",
-    "Has ridden a motorcycle",
-    "Has fostered an animal",
-    "Has won a competition",
-    "Has been on a road trip 1000km+",
-    "Has met their partner online",
-    "Has done a solo trip",
-    "Drinks no coffee at all",
-    "Has tried surfing",
-    "Has a sibling in tech",
-    "Has knitted or crocheted",
-    "Has been snowboarding",
-    "Has lived on a farm",
-    "Has played chess in a club",
-    "Has had braces as an adult",
-    "Has painted a mural",
-    "Has been to a World Cup / Olympics",
-    "Has worked night shifts",
-    "Has changed careers",
+    "Has played in a chess tournament",
+    "Has given a talk to 50+ people",
+    "Has published under their own name",
+    "Has won a sports trophy or medal",
+    "Has camped when there was snow",
+    "Has hitchhiked",
+    "Has flown in a helicopter",
+    "Has ridden a motorcycle on a road",
+    "Has stood up on a surfboard",
+    "Has milked a cow or a goat",
+    "Has eaten something they foraged",
+    "Has cooked or baked for 30+ people",
+    "Has worked a public holiday overnight",
+    "Has volunteered in another country",
+    "Has moved to a new country for work",
+    "Has lived somewhere with no cinema",
+    "Has read 30 books in a single year",
+    "Has been to an Olympics or World Cup",
+    "Has held a snake or a tarantula",
+    "Has walked inside a cave",
+    "Has helmed a sailboat",
+    "Has hiked with a pack overnight",
+    "Learned a language from scratch after 25",
+    "Has taught a workshop or class",
+    "Has queued overnight for tickets",
+    "Has celebrated New Year in another country",
 
-    // IKEA icebreakers — keep these short so they fit in a square.
+    // IKEA — two of these stay exact. The rest should be uncommon.
     "Owns more than 5 IKEA products",
     "Been to 5 different IKEAs",
-    "Assembled IKEA, no manual",
-    "Has spare IKEA Allen keys",
-    "Ate the IKEA meatballs",
-    "Owns a BILLY bookcase",
-    "Owns a FRAKTA blue bag",
-    "Got lost in the IKEA maze",
-    "Argued assembling IKEA",
-    "Can pronounce 3+ IKEA names"
+    "Has assembled an IKEA wardrobe alone",
+    "Has been to the IKEA in Älmhult",
+    "Has visited IKEA on two continents",
+    "Has built an IKEA PAX wardrobe alone",
+    "Can pronounce 8 IKEA product names",
+    "Has queued before an IKEA opened",
+    "Holds IKEA Family cards from 2 countries",
+    "Has driven an IKEA flat-pack 100km+"
   ]
 };
